@@ -2,12 +2,12 @@ from elixir import Entity, Field, Integer, Unicode, \
                    DateTime, SmallInteger, ManyToMany, \
                    using_options
 from elixir import session
-from sqlalchemy.orm import validates
-
 from datetime import datetime
+from .utils import simple_validator
 
 
 DEFAULT_STRING_SIZE = 100
+
 
 class ModelBase(Entity):
     using_options(abstract=True)
@@ -24,7 +24,6 @@ class ModelBase(Entity):
         return obj
 
 
-
 class MediaItem(ModelBase):
     using_options(abstract=True)
 
@@ -33,18 +32,14 @@ class MediaItem(ModelBase):
     time_used = Field(DateTime)
     use_count = Field(Integer)
     rating = Field(SmallInteger)
-
+    _validate_rating = simple_validator('rating', lambda val: val in xrange(5))
     tags = ManyToMany('Tag')
-
-    @validates('rating')
-    def validate_rating(self, key, rating):
-        assert rating in xrange(5)
-        return rating
 
     def __init__(self, **kwargs):
         kwargs.setdefault('use_count', 0)
         kwargs['time_added'] = datetime.now()
         ModelBase.__init__(self, **kwargs)
+
 
 class Tag(ModelBase):
     name = Field(Unicode(30), unique=True)
@@ -52,7 +47,7 @@ class Tag(ModelBase):
 
 def setup():
     from elixir import metadata, create_all, setup_all
-    from audio.models import Track
+    from mediaservice.audio.models import Track
 
     DATABASE = 'sqlite:///mediadb.sql'
     DEBUG = True

@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<manifest namespace="org.cream" version="0.1">
+    <component name="Mediaservice" id=".Mediaservice" version="0.1" type=".Service" entry="./service.py">
+        <author name="Jonas Haag" mail="jonas@cream-project.org" type="developer" />
+        <license title="GPL" version="3+" />
+
+        <use-feature id=".extensions" directory="." />
+    </component>
+</manifest>
