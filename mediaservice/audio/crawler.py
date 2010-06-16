@@ -16,7 +16,7 @@ def crawl(path):
             track = Track.from_file(file_)
             if track:
                 print file_
-                document.insert(track.to_json())
+                document.insert(track.to_dict())
         
 
 class Track(object):
@@ -31,7 +31,7 @@ class Track(object):
         self.rating = rating
         
 
-    def to_json(self):
+    def to_dict(self):
         '''returns a JSON representation of the Track'''
 
         return {'title': self.title,
@@ -54,7 +54,7 @@ class Track(object):
             try:
                 data[key] = metadata[key][0]
             except KeyError:
-                data[key] = None
+                data[key] = 'Unknown'
 
         return Track(data['title'],
                     data['artist'],
