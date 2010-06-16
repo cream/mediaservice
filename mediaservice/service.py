@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
+import pymongo
+
 import cream
 import cream.ipc
-import cream.extensions
-
 
 class Mediaservice(cream.Module, cream.ipc.Object):
     def __init__(self):
@@ -14,7 +16,8 @@ class Mediaservice(cream.Module, cream.ipc.Object):
         )
 
         self.extension_manager.load_all()
-
+        
+        self.db = pymongo.Connection().mediaservice
 
 if __name__ == '__main__':
     Mediaservice().main()
