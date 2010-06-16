@@ -1,6 +1,13 @@
+#!/usr/bin/env python
+
+import pymongo
+
 import cream.ipc
 import cream.extensions
-from mediaservice.audio.models import Track
+
+from crawler import crawl
+
+MUSIC_DIR = '/mnt/Daten/Musik'
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
@@ -11,32 +18,41 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
             '/org/cream/Mediaservice/Audio'
         )
 
-    @cream.ipc.method
+        self.document = pymongo.Connection().mediaservice.audio
+
+    @cream.ipc.method(interface='org.cream.Mediaservice.Audio')
     def update_library(self):
-        from mediaservice.audio.crawler import crawl
-        from mediaservice.audio import MUSIC_DIR
         crawl(MUSIC_DIR)
 
-    @cream.ipc.method('', 'aa{sv}')
+    @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def list_tracks(self):
-        return [track.to_dict() for track in Track.query.all()]
+        return [song for song in self.document.find()]
 
-    @cream.ipc.method('i', '')
-    def play_track_by_id(self, id):
-        self.player.play(Track.query.filter_by(id=id).one().absolute_path)
+
+    @cream.ipc.method('a{sv}', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
+    def query(self, query):
+        '''returns a list containing query results
+            query: dict. e.g. {'artist': 'Elvis Presly', 'title': 'rock around the clock'}
+        '''
+        return [song for song in self.document.find(query)]
+
 
     @cream.ipc.method('s', '')
     def play_track_by_path(self, path):
         self.player.play(Track.get_absolute_path(path))
 
+
     @cream.ipc.method
     def pause_playback(self):
         self.player.pause()
+
 
     @cream.ipc.method
     def stop_playback(self):
         self.player.stop()
 
+
     @cream.ipc.method
     def toggle_playback(self):
         self.player.toggle()
+
