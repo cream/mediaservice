@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 
-import pymongo
-import re
-
 import cream.ipc
 import cream.extensions
-
-from crawler import crawl
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
