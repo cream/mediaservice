@@ -26,7 +26,11 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
 
     @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def list_tracks(self):
-        return [song for song in self.document.find()]
+        tracks = []
+        for track in self.document.find():
+            track.pop('_id')
+            tracks.append(track)
+        return tracks
 
 
     @cream.ipc.method('a{sv}', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
@@ -34,7 +38,11 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         '''returns a list containing query results
             query: dict. e.g. {'artist': 'Elvis Presly', 'title': 'rock around the clock'}
         '''
-        return [song for song in self.document.find(query)]
+        tracks = []
+        for track in self.document.find(query):
+            track.pop('_id')
+            tracks.append(track)
+        return tracks
 
 
     @cream.ipc.method('s', '')
