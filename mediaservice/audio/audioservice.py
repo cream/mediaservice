@@ -49,7 +49,7 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
     @cream.ipc.method('s', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def query_all(self, querystring):
         #query every key in the db, will first work with mongodb 1.5.3
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find({$or : [
+        return map(mongodb_to_dbus_dict, self.collection.tracks.find({ '$or' : [
                                             {'artist': querystring},
                                             {'title': querystring},
                                             {'album': querystring},
