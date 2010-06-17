@@ -14,14 +14,14 @@ class Track(object):
         self.rating = rating
 
     def to_dict(self):
-    '''returns a JSON representation of the Track'''
+        '''returns a JSON representation of the Track'''
 
-    return {'title': self.title,
-            'artist': self.artist,
-            'album': self.album,
-            'genre': self.genre,
-            'year': self.year,
-            'length': self.length,
-            'path': self.path,
-            'rating': self.rating
-    }
+        return {'title': self.title,
+                'artist': self.artist,
+                'album': self.album,
+                'genre': self.genre,
+                'year': self.year,
+                'length': self.length,
+                'path': self.path,
+                'rating': self.rating
+        }
