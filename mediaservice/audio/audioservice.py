@@ -18,7 +18,7 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
     }
 
     def __init__(self, database):
-        cream.extensions.Extension.__init__(self)
+        cream.extensions.Extension.__init__(self, None)
         cream.ipc.Object.__init__(self,
             'org.cream.mediaservice',
             '/org/cream/Mediaservice/Audio'
@@ -33,7 +33,7 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
 
     @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def list_tracks(self):
-        return map(mongodb_to_dbus_dict, sef.collection.tracks.find())
+        return map(mongodb_to_dbus_dict, self.collection.tracks.find())
 
     @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def query(self, query):
