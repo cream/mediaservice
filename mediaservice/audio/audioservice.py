@@ -14,14 +14,15 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
             '/org/cream/Mediaservice/Audio'
         )
 
+        self.collection = args[0].audio
 
     @cream.ipc.method(interface='org.cream.Mediaservice.Audio')
     def list_tracks(self):
-        return [track for track in collection.find()]
+        return [track for track in self.collection.find()]
 
     @cream.ipc.method(interface='org.cream.Mediaservice.Audio')
     def query(self, query):
         for key in query.keys():
             query[key] = re.compile(query[key], re.IGNORECASE)
 
-        return [track for track in collection.find(query)]
+        return [track for track in self.collection.find(query)]

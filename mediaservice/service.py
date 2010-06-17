@@ -15,9 +15,9 @@ class Mediaservice(cream.Module, cream.ipc.Object):
             '/org/cream/Mediaservice'
         )
 
-        self.extension_manager.load_all()
-        
         self.db = pymongo.Connection().mediaservice
+        self.audioservice = self.extension_manager.load_by_name('Audioservice', self.db)
+
 
 if __name__ == '__main__':
     Mediaservice().main()
