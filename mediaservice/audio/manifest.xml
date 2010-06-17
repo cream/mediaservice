@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <manifest namespace="org.cream" version="0.0.5">
-    <component name="Audio service" id=".mediaservice.Audio" version="0.1" type=".Extension" entry="./audioservice.py">
+    <component name="Audioservice" id=".mediaservice.Audio" version="0.1" type=".Extension" entry="./audioservice.py">
         <author name="Jonas Haag" mail="jonas@cream-project.org" type="developer" />
         <author name="Kristoffer Kleine" type="developer" />
         <license title="GPL" version="3+" />
