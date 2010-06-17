@@ -5,6 +5,8 @@ import cream.extensions
 
 import re
 
+from crawler import crawl
+
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
     def __init__(self, *args, **kwargs):
@@ -15,6 +17,10 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         )
 
         self.collection = args[0].audio
+
+    @cream.ipc.method('s', interface='org.cream.Mediaservice.Audio')
+    def update_library(self, path):
+        crawl(self.collection, path)
 
     @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def list_tracks(self):
