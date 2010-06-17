@@ -2,26 +2,24 @@
 
 
 class Track(object):
+    _fields = (
+        'path', 'title', 'artist', 'album',
+        'genre', 'year', 'length', 'rating'
+    )
+    def __init__(self, **kwargs):
+        for attr in Track._fields:
+            setattr(self, attr, kwargs.pop(attr, None))
 
-    def __init__(self, title, artist, album, genre, year, length, path, rating):
-        self.title = title
-        self.artist = artist
-        self.album = album
-        self.genre = genre
-        self.year = year
-        self.length = length
-        self.path = path
-        self.rating = rating
+        if kwargs:
+            raise TypeError("%s.__init__ got unexpected keyword arguments %s"
+                            % (type(self).__name__, ', '.join(kwargs.iterkeys())))
+
+    @classmethod
+    def from_dict(cls, dct):
+        return cls(**dct)
 
     def to_dict(self):
-        '''returns a JSON representation of the Track'''
-
-        return {'title': self.title,
-                'artist': self.artist,
-                'album': self.album,
-                'genre': self.genre,
-                'year': self.year,
-                'length': self.length,
-                'path': self.path,
-                'rating': self.rating
-        }
+        """ Returns a dict/JSON representation of the Track. """
+        return dict(
+            (attr, getattr(self, attr)) for attr in Track._fields
+        )
