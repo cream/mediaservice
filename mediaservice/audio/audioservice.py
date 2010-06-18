@@ -7,7 +7,7 @@ import cream.extensions
 from crawler import crawl
 
 def mongodb_to_dbus_dict(dict_):
-    dict_['_id'] = str(dict_['_id'])
+    dict_['_id'] = unicode(dict_['_id'])
     return dict_
 
 @cream.extensions.register
