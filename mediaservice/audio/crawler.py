@@ -14,7 +14,7 @@ def crawl(collection, path, force_update=False):
             # could not parse the file
             continue
 
-        data = dict((k, metadata.get(k, [''])[0]) for k in
+        data = dict((k, metadata.get(k, [None])[0]) for k in
                     ('title', 'artist', 'album', 'genre', 'year'))
         data.update({
             'length' : metadata.info.length,
