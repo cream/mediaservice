@@ -36,15 +36,13 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         return map(mongodb_to_dbus_dict, self.collection.tracks.find())
 
     @cream.ipc.method('a{sv}', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
-    def query(self, query):
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find(query))
+    def query(self, query, ignorecase=False):
+        if ignorecase:
+            for key, value in query.iteritems():
+                if isinstance(value, basestring):
+                    query[key] = re.compile(value, re.IGNORECASE)
 
-    @cream.ipc.method('a{sv}', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
-    def query_ignorecase(self, query):
-        for key, value in query.iteritems():
-            if isinstance(value, basestring):
-                query[key] = re.compile(value, re.IGNORECASE)
-        return self.query(query)
+        return map(mongodb_to_dbus_dict, self.collection.tracks.find(query))
 
     @cream.ipc.method('s', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
     def query_all(self, querystring):
@@ -60,7 +58,6 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
     @cream.ipc.method('sa{sv}', '', interface='org.cream.Mediaservice.Audio')
     def update_track(self, _id, track_new):
         self.collection.update({'_id': _id}, {'$set': track_new})
-
 
     @cream.ipc.method('s', '', interface='org.cream.Mediaservice.Audio')
     def remove_track(self, _id):
