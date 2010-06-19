@@ -23,27 +23,27 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
             'org.cream.mediaservice',
             '/org/cream/Mediaservice/Audio'
         )
-        self.collection = extension_interface.database.audio
+        self.document = extension_interface.database.audio
 
 
     @cream.ipc.method('s')
     def update_library(self, path):
-        crawl(self.collection.tracks, path)
+        crawl(self.document.tracks, path)
         self.emit_signal('library_updated')
 
-    @cream.ipc.method('a{sv}b', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
+    @cream.ipc.method('a{sv}b', 'aa{sv}')
     def query(self, query, ignorecase):
         if ignorecase:
             for key, value in query.iteritems():
                 if isinstance(value, basestring):
                     query[key] = re.compile(value, re.IGNORECASE)
 
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find(query))
+        return map(mongodb_to_dbus_dict, self.document.tracks.find(query))
 
-    @cream.ipc.method('sa{sv}', '', interface='org.cream.Mediaservice.Audio')
+    @cream.ipc.method('sa{sv}')
     def update_track(self, _id, track_new):
-        self.collection.update({'_id': _id}, {'$set': track_new})
+        self.document.update({'_id': _id}, {'$set': track_new})
 
-    @cream.ipc.method('s', '', interface='org.cream.Mediaservice.Audio')
+    @cream.ipc.method('s')
     def remove_track(self, _id):
-        self.collection.remove(_id)
+        self.document.remove(_id)
