@@ -31,29 +31,14 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         crawl(self.collection.tracks, path)
         self.emit_signal('library_updated')
 
-    @cream.ipc.method('', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
-    def list_tracks(self):
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find())
-
-    @cream.ipc.method('a{sv}', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
-    def query(self, query, ignorecase=False):
+    @cream.ipc.method('a{sv}b', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
+    def query(self, query, ignorecase):
         if ignorecase:
             for key, value in query.iteritems():
                 if isinstance(value, basestring):
                     query[key] = re.compile(value, re.IGNORECASE)
 
         return map(mongodb_to_dbus_dict, self.collection.tracks.find(query))
-
-    @cream.ipc.method('s', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
-    def query_all(self, querystring):
-        #query every key in the db, will first work with mongodb 1.5.3
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find({ '$or' : [
-                                            {'artist': querystring},
-                                            {'title': querystring},
-                                            {'album': querystring},
-                                            {'genre': querystring},
-                                            {'year': querystring} ]}
-                    ))
 
     @cream.ipc.method('sa{sv}', '', interface='org.cream.Mediaservice.Audio')
     def update_track(self, _id, track_new):
