@@ -7,7 +7,7 @@ import cream.extensions
 from crawler import crawl
 
 def mongodb_to_dbus_dict(dict_):
-    dict_['_id'] = str(dict_['_id'])
+    dict_['_id'] = unicode(dict_['_id'])
     return dict_
 
 @cream.extensions.register
@@ -31,37 +31,20 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         crawl(self.collection.tracks, path)
         self.emit_signal('library_updated')
 
-    @cream.ipc.method('', 'aa{sv}')
-    def list_tracks(self):
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find())
+    @cream.ipc.method('a{sv}b', 'aa{sv}', interface='org.cream.Mediaservice.Audio')
+    def query(self, query, ignorecase):
+        if ignorecase:
+            for key, value in query.iteritems():
+                if isinstance(value, basestring):
+                    query[key] = re.compile(value, re.IGNORECASE)
 
-    @cream.ipc.method('a{sv}', 'aa{sv}')
-    def query(self, query):
         return map(mongodb_to_dbus_dict, self.collection.tracks.find(query))
 
-    @cream.ipc.method('a{sv}', 'aa{sv}')
-    def query_ignorecase(self, query):
-        for key, value in query.iteritems():
-            if isinstance(value, basestring):
-                query[key] = re.compile(value, re.IGNORECASE)
-        return self.query(query)
-
-    @cream.ipc.method('s', 'aa{sv}')
-    def query_all(self, querystring):
-        #query every key in the db, will first work with mongodb 1.5.3
-        return map(mongodb_to_dbus_dict, self.collection.tracks.find({'$or' : [
-                                            {'artist': querystring},
-                                            {'title': querystring},
-                                            {'album': querystring},
-                                            {'genre': querystring},
-                                            {'year': querystring} ]}
-                    ))
-
-    @cream.ipc.method('sa{sv}', '')
+    @cream.ipc.method('sa{sv}', '', interface='org.cream.Mediaservice.Audio')
     def update_track(self, _id, track_new):
         self.collection.update({'_id': _id}, {'$set': track_new})
 
-
-    @cream.ipc.method('s', '')
+    @cream.ipc.method('s', '', interface='org.cream.Mediaservice.Audio')
+>>>>>>> 584b35a895aad441acdd33f6d537da5ecaa90e0b
     def remove_track(self, _id):
         self.collection.remove(_id)
