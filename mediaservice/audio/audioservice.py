@@ -45,6 +45,5 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         self.collection.update({'_id': _id}, {'$set': track_new})
 
     @cream.ipc.method('s', '', interface='org.cream.Mediaservice.Audio')
->>>>>>> 584b35a895aad441acdd33f6d537da5ecaa90e0b
     def remove_track(self, _id):
         self.collection.remove(_id)
