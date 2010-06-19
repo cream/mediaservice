@@ -13,7 +13,11 @@ def mongodb_to_dbus_dict(dict_):
     return dict_
 
 def dbus_to_mongodb_dict(dict_):
-    for key, value in dict_.items():
+    """
+    Converts various dbus type subclasses to native Python types.
+    (for example, dbus.Int32 -> int)
+    """
+    for key, value in dict_.iteritems():
         if isinstance(value, float):
             dict_[key] = float(value)
         elif isinstance(value, int):
@@ -55,7 +59,7 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
     def update_or_add(self, track):
         track = dbus_to_mongodb_dict(track)
         self.document.save(track)
-            
+
     @cream.ipc.method('s')
     def remove_track(self, _id):
         self.document.remove(_id)
