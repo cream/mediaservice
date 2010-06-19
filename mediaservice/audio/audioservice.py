@@ -8,22 +8,12 @@ from crawler import crawl
 import re
 from pymongo.objectid import ObjectId
 
-def mongodb_to_dbus_dict(dict_):
-    dict_['_id'] = unicode(dict_['_id'])
-    return dict_
-
-def dbus_to_mongodb_dict(dict_):
-    """
-    Converts various dbus type subclasses to native Python types.
-    (for example, dbus.Int32 -> int)
-    """
-    for key, value in dict_.iteritems():
-        if isinstance(value, float):
-            dict_[key] = float(value)
-        elif isinstance(value, int):
-            dict_[key] = int(value)
-    dict_['_id'] = ObjectId(dict_['_id'])
-    return dict_
+def convert_objectid(dict_):
+    _id = dict_['_id']
+    if isinstance(_id, basestring):
+        dict_['_id'] = ObjectId(_id)
+    else:
+        dict_['_id'] = unicode(d_id)
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
@@ -40,7 +30,6 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
         )
         self.document = extension_interface.database.audio.tracks
 
-
     @cream.ipc.method('s')
     def update_library(self, path):
         crawl(self.document, path)
@@ -53,11 +42,11 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
                 if isinstance(value, basestring):
                     query[key] = re.compile(value, re.IGNORECASE)
 
-        return map(mongodb_to_dbus_dict, self.document.find(query))
+        return map(convert_objectid, self.document.find(query))
 
     @cream.ipc.method('a{sv}')
     def update_or_add(self, track):
-        track = dbus_to_mongodb_dict(track)
+        track = convert_objectid(track)
         self.document.save(track)
 
     @cream.ipc.method('s')
