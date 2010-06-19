@@ -13,7 +13,7 @@ class Mediaservice(cream.Module, cream.ipc.Object):
         cream.Module.__init__(self)
         cream.ipc.Object.__init__(self,
             'org.cream.mediaservice',
-            '/org/cream/Mediaservice'
+            '/org/cream/MediaService'
         )
 
         self.database = pymongo.Connection().mediaservice
