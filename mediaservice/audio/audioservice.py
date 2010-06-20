@@ -9,11 +9,12 @@ import re
 from pymongo.objectid import ObjectId
 
 def convert_objectid(dict_):
-    _id = dict_['_id']
-    if isinstance(_id, basestring):
-        dict_['_id'] = ObjectId(_id)
-    else:
-        dict_['_id'] = unicode(d_id)
+    if dict_.has_key('_id'):
+        _id = dict_['_id']
+        if isinstance(_id, basestring):
+            dict_['_id'] = ObjectId(_id)
+        else:
+            dict_['_id'] = unicode(d_id)
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
