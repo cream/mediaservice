@@ -8,14 +8,13 @@ from crawler import crawl
 import re
 from pymongo.objectid import ObjectId
 
-def convert_objectid(dict_):   
-    if dict_.has_key('_id'):
-        _id = dict_['_id']
-        if isinstance(_id, basestring):
-            dict_['_id'] = ObjectId(_id)
+def convert_objectid(dict_):
+    object_id = dict_.get('_id')
+    if object_id is not None:
+        if isinstance(object_id, basestring):
+            dict_['_id'] = ObjectId(object_id)
         else:
-            dict_['_id'] = unicode(d_id)
-
+            dict_['_id'] = unicode(object_id)
     return dict_
 
 @cream.extensions.register
