@@ -8,13 +8,15 @@ from crawler import crawl
 import re
 from pymongo.objectid import ObjectId
 
-def convert_objectid(dict_):
+def convert_objectid(dict_):   
     if dict_.has_key('_id'):
         _id = dict_['_id']
         if isinstance(_id, basestring):
             dict_['_id'] = ObjectId(_id)
         else:
             dict_['_id'] = unicode(d_id)
+
+    return dict_
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
