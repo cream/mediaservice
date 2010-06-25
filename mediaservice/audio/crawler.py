@@ -1,26 +1,46 @@
 #!/usr/bin/env python
+
+import mutagen
 from os.path import relpath
 from cream.util import walkfiles
-import mutagen
-from models import Track
 
-def crawl(collection, path, force_update=False):
+
+def get_tracknumber(data):
+    
+    tracknumber = data.get('tracknumber', [None])[0]
+    if tracknumber:
+        return tracknumber.split('/')[0]
+    else:
+        return '1'
+
+
+def crawl(path, collection):
     for file_ in walkfiles(path):
-        if not force_update and collection.find_one({'path': file_}):
-            # file already tracked
-            continue
         metadata = mutagen.File(file_, easy=True)
         if not metadata:
-            # could not parse the file
             continue
+            #file not supported
 
-        data = dict((k, metadata.get(k, [''])[0]) for k in
-                    ('title', 'artist', 'album', 'genre', 'year'))
-        data.update({
-            'length' : metadata.info.length,
-            'rating' : 0,
-            'path'   : relpath(file_, path)
-        })
+        artist = metadata.get('artist', [''])[0]
+        album = metadata.get('album', [''])[0]
+        title = metadata.get('title', [''])[0]
+        year = metadata.get('year', [''])[0]
+        genre = metadata.get('genre', [''])[0]
+        tracknumber = get_tracknumber(metadata)
+        duration = metadata.info.length
+        rating = 0
 
-        track = Track.from_dict(data)
-        collection.insert(track.to_dict())
+        track = {'artist': artist,
+                'album': album,
+                'title': title,
+                'year': year,
+                'genre': genre,
+                'tracknumber': tracknumber,
+                'duration': duration,
+                'rating': rating,
+                'path': file_
+
+        }
+        
+        collection.save(track)
+
