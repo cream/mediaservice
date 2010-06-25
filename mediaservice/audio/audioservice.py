@@ -6,51 +6,44 @@ import cream.extensions
 from crawler import crawl
 
 import re
-from pymongo.objectid import ObjectId
-
-def convert_objectid(dict_):
-    object_id = dict_.get('_id')
-    if object_id is not None:
-        if isinstance(object_id, basestring):
-            dict_['_id'] = ObjectId(object_id)
-        else:
-            dict_['_id'] = unicode(object_id)
-    return dict_
+from util import build_tree, convert_objectid
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
 
     __ipc_signals__ = {
-        'library_updated': ('', 'org.cream.MediaService.Audio')
+        'library_updated': ('', 'org.cream.Media.Audio')
     }
 
     def __init__(self, extension_interface):
         cream.extensions.Extension.__init__(self, extension_interface)
         cream.ipc.Object.__init__(self,
-            'org.cream.mediaservice',
-            '/org/cream/MediaService/Audio'
+            'org.cream.media',
+            '/org/cream/Media/Audio'
         )
-        self.document = extension_interface.database.audio.tracks
+
+        self.collection = extension_interface.database.audio
+
 
     @cream.ipc.method('s')
     def update_library(self, path):
-        crawl(self.document, path)
+        crawl(path, self.collection.tracks)
         self.emit_signal('library_updated')
 
-    @cream.ipc.method('a{sv}b', 'aa{sv}')
+    @cream.ipc.method('a{sv}b', 'a{sa{sa{sa{sv}}}}')
     def query(self, query, ignorecase):
         if ignorecase:
             for key, value in query.iteritems():
                 if isinstance(value, basestring):
                     query[key] = re.compile(value, re.IGNORECASE)
 
-        return map(convert_objectid, self.document.find(query))
+        return build_tree(self.collection.tracks.find(query))
 
     @cream.ipc.method('a{sv}')
     def update_or_add(self, track):
         track = convert_objectid(track)
-        self.document.save(track)
+        self.collection.tracks.save(track)
 
     @cream.ipc.method('s')
     def remove_track(self, _id):
-        self.document.remove(_id)
+        self.collection.tracks.remove(_id)
