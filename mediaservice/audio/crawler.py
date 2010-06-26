@@ -15,7 +15,7 @@ def crawl(path, collection):
 
         artist, album, title, year, genre, tracknumber = \
             map(lambda key: get_first_item_or_none(metadata.get(key)),
-                ('artist', 'album', 'title', 'year', 'genre', 'tracknumber'))
+                ('artist', 'album', 'title', 'date', 'genre', 'tracknumber'))
         if tracknumber is not None:
             # 5/12 -> 5
             tracknumber = tracknumber.split('/')[0]
