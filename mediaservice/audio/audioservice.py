@@ -35,7 +35,8 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
                 if isinstance(value, basestring):
                     query[key] = re.compile(value, re.IGNORECASE)
 
-        return build_tree(self.collection.tracks.find(query))
+        return build_tree(self.collection.tracks.find(query),
+                          convert_none_to_empty_string=True)
 
     @cream.ipc.method('a{sv}')
     def update_or_add(self, track):

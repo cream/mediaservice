@@ -13,23 +13,27 @@ def convert_objectid(dict_):
             dict_['_id'] = unicode(object_id)
     return dict_
 
-def build_tree(tracks):
+def build_tree(tracks, convert_none_to_empty_string=False):
+    if convert_none_to_empty_string:
+        _ = lambda x: x if x is not None else ''
+    else:
+        _ = lambda x: x
     tree = defaultdict(lambda: defaultdict(dict))
 
     for track in tracks:
         track = convert_objectid(track)
-        artist = track['artist']
-        album = track['album']
-        title = track['title']
+        artist = _(track['artist'])
+        album = _(track['album'])
+        title = _(track['title'])
 
         if title not in tree[artist][album]:
             # XXX: what do with two tracks with the same name?
             tree[artist][album][title] = {
-                'rating': track['rating'],
-                'duration': track['duration'],
-                'genre': track['genre'],
-                'path': track['path'],
-                'id': track['_id']
+                'id'      : _(track['_id']),
+                'path'    : _(track['path']),
+                'genre'   : _(track['genre']),
+                'rating'  : _(track['rating']),
+                'duration': _(track['duration'])
             }
 
     return tree
