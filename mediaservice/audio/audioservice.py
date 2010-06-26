@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-
+import re
 import cream.ipc
 import cream.extensions
 
 from crawler import crawl
-
-import re
 from util import build_tree, convert_objectid
 
 @cream.extensions.register
