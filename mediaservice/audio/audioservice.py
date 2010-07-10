@@ -30,6 +30,8 @@ class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
 
     @cream.ipc.method('a{sv}b', 'a{sa{sa{sa{sv}}}}')
     def query(self, query, ignorecase):
+        if '_id' in query:
+            query = convert_objectid(query)
         if ignorecase:
             for key, value in query.iteritems():
                 if isinstance(value, basestring):
