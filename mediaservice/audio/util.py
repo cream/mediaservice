@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from collections import defaultdict
-from pymongo.objectid import Objectid
+from pymongo.objectid import ObjectId
 
 def get_first_item_or_none(obj):
     return obj if obj is None else obj[0]
@@ -35,7 +35,11 @@ def build_tree(tracks, convert_none_to_empty_string=False):
                 'path'    : _(track['path']),
                 'genre'   : _(track['genre']),
                 'rating'  : _(track['rating']),
-                'duration': _(track['duration'])
+                'duration': _(track['duration']),
+                'artist': _(track['artist']),
+                'album': _(track['album']),
+                'title': _(track['title']),
+                'tracknumber': _(track['tracknumber']),
             }
 
     return tree

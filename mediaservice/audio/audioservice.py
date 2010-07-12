@@ -3,24 +3,116 @@ import re
 import cream.ipc
 import cream.extensions
 
+import gobject
+
 from crawler import crawl
 from util import build_tree, convert_objectid
+
+from pymongo.objectid import ObjectId
+
+import gst
 
 @cream.extensions.register
 class AudioExtension(cream.extensions.Extension, cream.ipc.Object):
 
-    __ipc_signals__ = {
-        'library_updated': ('', 'org.cream.Media.Audio')
-    }
+    def __init__(self, api):
 
-    def __init__(self, extension_interface):
-        cream.extensions.Extension.__init__(self, extension_interface)
+        cream.extensions.Extension.__init__(self, api)
         cream.ipc.Object.__init__(self,
             'org.cream.media',
             '/org/cream/Media/Audio'
         )
 
-        self.collection = extension_interface.database.audio
+        self.api = api
+
+        self.collection = AudioCollection(api)
+        self.player = AudioPlayer(api)
+
+
+class AudioPlayer(cream.ipc.Object):
+
+    __ipc_signals__ = {
+        'state_changed': ('a{sv}', 'org.cream.Media.Audio.Player')
+    }
+
+    def __init__(self, api):
+
+        cream.ipc.Object.__init__(self,
+            'org.cream.media',
+            '/org/cream/Media/Audio/Player'
+        )
+
+        self.api = api
+        self.collection = self.api.database.audio
+
+        self.active_track = None
+
+        self.player = gst.parse_launch('playbin2')
+
+        gobject.timeout_add(100, self.update)
+
+
+    def update(self):
+
+        if self.active_track:
+            track = str(self.active_track['_id'])
+        else:
+            track = False
+
+        try:
+            position = self.player.query_position(gst.FORMAT_TIME)[0] / 1000000000.0
+        except:
+            position = 0.0
+
+        state = int(self.player.get_state()[1])
+
+        data = {
+            'state': state,
+            'track': track,
+            'position': position
+            }
+
+        self.emit_signal('state_changed', data)
+        return True
+
+
+    @cream.ipc.method('s')
+    def set_track(self, id):
+        self.active_track = self.collection.tracks.find({'_id': ObjectId(id)})[0]
+
+        self.player.set_state(gst.STATE_NULL)
+        self.player.set_property('uri', 'file://{0}'.format(self.active_track['path']))
+
+        self.update()
+
+
+    @cream.ipc.method
+    def play(self):
+        self.player.set_state(gst.STATE_PLAYING)
+        self.update()
+
+
+    @cream.ipc.method
+    def pause(self):
+        self.player.set_state(gst.STATE_PAUSED)
+        self.update()
+
+
+class AudioCollection(cream.ipc.Object):
+
+    __ipc_signals__ = {
+        'library_updated': ('', 'org.cream.Media.Audio.Player')
+    }
+
+    def __init__(self, api):
+
+        cream.ipc.Object.__init__(self,
+            'org.cream.media',
+            '/org/cream/Media/Audio/Collection'
+        )
+
+        self.api = api
+        self.collection = self.api.database.audio
 
 
     @cream.ipc.method('s')
